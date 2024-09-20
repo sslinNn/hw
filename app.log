@@ -1,0 +1,11 @@
+2024-09-21 00:40:15,308 - my_logger - INFO - Главная страница была запрошена
+2024-09-21 00:40:15,310 - my_logger - INFO - Главная страница была запрошена
+2024-09-21 00:41:22,306 - my_logger - DEBUG - Debug route accessed
+2024-09-21 00:41:35,129 - my_logger - ERROR - Ошибка деления на ноль!
+Traceback (most recent call last):
+  File "C:\Users\slinm\Desktop\flaskProject\app.py", line 41, in error_route
+    1 / 0  # Пример ошибки
+    ~~^~~
+ZeroDivisionError: division by zero
+2024-09-21 00:41:46,511 - my_logger - CRITICAL - Критическая ошибка на этой странице!
+2024-09-21 00:42:05,475 - my_logger - INFO - Главная страница была запрошена
