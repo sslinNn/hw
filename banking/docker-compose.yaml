@@ -1,0 +1,76 @@
+version: '3'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: banking_db
+    ports:
+      - "5432:5432"
+
+  transaction_manager_service:
+    build:
+      context: ./services/transaction_manager_service
+    image: transaction_manager_service
+    ports:
+      - "5000:5000"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - banking_net
+
+  transaction_service:
+    build:
+      context: ./services/transaction_service
+    image: transaction_service
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=banking_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - kafka
+      - postgres
+    networks:
+      - banking_net
+
+  valute_converter_service:
+    build:
+      context: ./services/valute_converter_service
+    image: valute_converter_service
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS_HOST=redis
+    depends_on:
+      - kafka
+      - redis
+    networks:
+      - banking_net
+
+networks:
+  banking_net:
+    driver: bridge
